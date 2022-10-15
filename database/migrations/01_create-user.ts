@@ -9,7 +9,6 @@ const up: MigrationFn<QueryInterface> = async function ({
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
     },
     firstName: {
       type: DataTypes.STRING,
