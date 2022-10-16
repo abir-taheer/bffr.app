@@ -1,0 +1,1 @@
+export const GOOGLE_CLIENT_ID = process.env.NEXT_APP_GOOGLE_CLIENT_ID || "181439019208-7bulfhrtkc1cnfie96ghkgvnjohm33nl.apps.googleusercontent.com";

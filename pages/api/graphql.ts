@@ -4,6 +4,10 @@ import { createComplexityLimitRule } from "graphql-validation-complexity";
 import resolvers from "../../graphql/resolvers";
 import typeDefs from "../../graphql/typeDefs";
 import { NextApiHandler } from "next";
+import { runMiddleware } from "../../utils/runMiddleware";
+import expressSession from "express-session";
+import MysqlStore from "express-mysql-session";
+import User from "../../database/models/User";
 
 const ComplexityLimitRule = createComplexityLimitRule(35000, {
   scalarCost: 1,
@@ -11,11 +15,42 @@ const ComplexityLimitRule = createComplexityLimitRule(35000, {
   listFactor: 10,
 });
 
+const credentials = new URL(process.env.SEQUELIZE_URL || "");
+
+// @ts-ignore
+const sessionStore = new MysqlStore({
+  // @ts-ignore
+  host: credentials.hostname,
+  port: 3306,
+  user: credentials.username,
+  password: credentials.password,
+  database: "bffr",
+});
+
+const session = expressSession({
+  secret: process.env.SESSION_SECRET || "bananas",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+    sameSite: "lax",
+    secure: true,
+  },
+  store: sessionStore,
+});
+
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req, res }) => {
-    const user = req.user;
+    await runMiddleware(req, res, session as any);
+
+    let user: User | null = null;
+
+    if (req.session.userID) {
+      user = await User.findOne({ where: { id: req.session.userID } });
+    }
+
     const signedIn = req.signedIn;
 
     function authenticationRequired() {
@@ -24,15 +59,9 @@ const apolloServer = new ApolloServer({
       }
     }
 
-    function adminRequired() {
-      authenticationRequired();
-      if (!user.adminPrivileges) {
-        throw new ForbiddenError("You must be an admin to perform that query");
-      }
-    }
-
     return {
       user,
+      session: req.session,
     };
   },
   // @ts-ignore
@@ -56,7 +85,7 @@ let serverStarted = false;
 let handler: NextApiHandler | null = null;
 
 const APIHandler: NextApiHandler = async (req, res) => {
-  if (!serverStarted || ! handler) {
+  if (!serverStarted || !handler) {
     await apolloServer.start();
     handler = apolloServer.createHandler({
       path: "/api/graphql",

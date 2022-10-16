@@ -1,7 +1,7 @@
-import createUser from "./createUser";
-
+import login from "./login"
+;
 const Mutation = {
-  createUser,
+  login
 };
 
 export default Mutation;
