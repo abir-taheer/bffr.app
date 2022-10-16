@@ -4,6 +4,41 @@ import styles from "../styles/Home.module.css";
 import GoogleSignIn from "../components/auth/GoogleSignIn";
 import { useAtomValue } from "jotai";
 import UserAtom from "../components/auth/User";
+import { Divider, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import Button from "@mui/material/Button";
+import Link from "next/link";
+
+function CoolInput({
+  text,
+  interval = 50,
+}: {
+  text: string;
+  interval: number;
+}) {
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (value.length < text.length) {
+        setValue(value + text[value.length]);
+      } else {
+        setTimeout(() => {
+          setValue("");
+        }, 2000);
+      }
+    }, interval);
+  }, [value, text, interval]);
+
+  return (
+    <TextField
+      fullWidth
+      style={{ maxWidth: 800 }}
+      InputProps={{ readOnly: true }}
+      value={value}
+    />
+  );
+}
 
 const Home: NextPage = () => {
   const user = useAtomValue(UserAtom);
@@ -20,12 +55,112 @@ const Home: NextPage = () => {
           alt="logo"
           style={{
             width: 300,
-            height: 300,
+            height: 250,
+            objectFit: "contain",
+          }}
+        />
+        <Typography variant={"subtitle2"} style={{ marginBottom: 20 }}>
+          ...for real
+        </Typography>
+
+        {user ? (
+          <>
+            <Typography variant={"h2"}>
+              Welcome back {user?.firstName}!
+            </Typography>
+
+            <Link passHref href={"/boards"}>
+              <Button variant={"outlined"}>See my boards</Button>
+            </Link>
+          </>
+        ) : (
+          <GoogleSignIn />
+        )}
+
+        <hr />
+        <div
+          style={{
+            height: 2,
+            width: "30vw",
+            background: "rgba(0,0,0,0.1)",
+            margin: "32px 0",
+          }}
+        />
+        <Typography variant={"h1"} color={"primary"}>
+          How does it work?
+        </Typography>
+        <img
+          src={"/cycling.png"}
+          alt="logo"
+          style={{
+            width: 300,
+            height: 250,
+            objectFit: "contain",
+          }}
+        />
+        <Typography variant={"subtitle1"}>
+          You pick an activity. Describe what you and your friends are going to
+          be doing in a simple short sentence.
+        </Typography>
+
+        <CoolInput
+          text={"Hacking in the Harvard SOCH building"}
+          interval={50}
+        />
+        <div
+          style={{
+            height: 2,
+            width: "30vw",
+            background: "rgba(0,0,0,0.1)",
+            margin: "32px 0",
           }}
         />
 
+        <Typography variant={"h2"}>
+          We&apos;ll generate a unique link for you to share with your friends.
+        </Typography>
+        <Typography variant={"subtitle2"}>
+          You and everyone you invite will get a bingo board of activities that
+          they need to photograph.
+        </Typography>
 
-        <GoogleSignIn />
+        <img
+          src={"/photographer.png"}
+          alt="logo"
+          style={{
+            width: 300,
+            height: 250,
+            objectFit: "contain",
+          }}
+        />
+        <div
+          style={{
+            height: 2,
+            width: "30vw",
+            background: "rgba(0,0,0,0.1)",
+            margin: "32px 0",
+          }}
+        />
+
+        <Typography variant={"h2"}>Track everyone&apos;s progress</Typography>
+        <Typography variant={"subtitle2"}>
+          You can see everyone&apos; progress in real time and have memories to
+          look back upon later.
+        </Typography>
+
+        <img
+          src={"/people.png"}
+          alt="logo"
+          style={{
+            width: 300,
+            height: 350,
+            objectFit: "contain",
+          }}
+        />
+
+        <Link passHref href={"/boards"}>
+          <Button variant={"outlined"}>Get started</Button>
+        </Link>
       </main>
     </div>
   );

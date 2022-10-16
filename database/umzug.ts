@@ -13,5 +13,6 @@ const umzug = new Umzug({
   storage: new SequelizeStorage({ sequelize }),
   logger: console,
 });
+umzug.up();
 
 export default umzug;

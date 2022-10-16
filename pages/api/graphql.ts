@@ -68,7 +68,7 @@ const apolloServer = new ApolloServer({
   playground: {
     settings: {
       "schema.polling.enable": false,
-      "request.credentials": "same-origin",
+      "request.credentials": "include",
       "prettier.useTabs": true,
     },
   },

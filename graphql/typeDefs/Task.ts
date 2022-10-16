@@ -1,15 +1,13 @@
 import { gql } from "apollo-server-micro";
 
 export default gql`
-  type Board {
+  type Task {
     id: Int!
 
-    activity: Activity!
-    user: User!
-
-    activities: [Activity!]!
+    order: Int!
+    action: String!
 
     createdAt: DateTime!
     updatedAt: DateTime!
   }
-`
+`;

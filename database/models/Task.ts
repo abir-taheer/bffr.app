@@ -6,20 +6,23 @@ import {
   Model,
 } from "sequelize";
 import sequelize from "../sequelize";
-import Activity from "./Activity";
+import User from "./User";
 import ActivityMember from "./ActivityMember";
+import Activity from "./Activity";
 
-export default class User extends Model<
-  InferAttributes<User, {}>,
-  InferCreationAttributes<User, {}>
+export default class Task extends Model<
+  InferAttributes<Task, {}>,
+  InferCreationAttributes<Task, {}>
 > {
   // id can be undefined during creation when using `autoIncrement`
   declare id: CreationOptional<string>;
-  declare firstName: string;
-  declare lastName: string;
-  declare email: string;
 
-  declare picture: string | null;
+  declare userId: string;
+  declare activityId: number;
+
+  declare order: number;
+
+  declare action: string;
 
   // createdAt can be undefined during creation
   declare createdAt: CreationOptional<Date>;
@@ -29,29 +32,30 @@ export default class User extends Model<
   declare deletedAt: CreationOptional<Date>;
 }
 
-User.init(
+Task.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    firstName: {
-      type: new DataTypes.STRING(256),
+    userId: {
+      type: DataTypes.STRING(256),
       allowNull: false,
     },
-    lastName: {
-      type: new DataTypes.STRING(256),
+    activityId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    email: {
-      type: new DataTypes.STRING(256),
+    order: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    picture: {
-      type: new DataTypes.TEXT(),
-      allowNull: true,
+    action: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
+
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
     deletedAt: {
@@ -60,12 +64,12 @@ User.init(
     },
   },
   {
-    tableName: "User",
+    tableName: "Task",
     sequelize,
     paranoid: true,
   }
 );
-
 setImmediate(() => {
-  User.belongsToMany(Activity, { through: ActivityMember });
+  Task.belongsTo(User, { foreignKey: "userId" });
+  Task.belongsTo(Activity, { foreignKey: "activityId" });
 });

@@ -6,7 +6,6 @@ export default gql`
 
     index: Int!
 
-    board: Board!
 
     createdAt: DateTime!
     updatedAt: DateTime!

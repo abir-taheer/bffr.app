@@ -1,7 +1,9 @@
 import login from "./login"
-;
+import createActivity from "./createActivity";
+
 const Mutation = {
-  login
+  login,
+  createActivity
 };
 
 export default Mutation;

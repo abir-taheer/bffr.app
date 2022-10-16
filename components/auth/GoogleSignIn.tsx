@@ -12,7 +12,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
- function LoginButton() {
+function LoginButton() {
   const [login, { loading }] = useMutation(LOGIN_MUTATION);
 
   const onSuccess = useCallback(
@@ -20,7 +20,9 @@ const LOGIN_MUTATION = gql`
       if (token) {
         const res = await login({ variables: { idToken: token } });
 
-        console.log(res.data);
+        if (res.data.login.id) {
+          window.location.reload()
+        }
       }
     },
     [login]

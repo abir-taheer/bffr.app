@@ -6,20 +6,18 @@ import {
   Model,
 } from "sequelize";
 import sequelize from "../sequelize";
-import Activity from "./Activity";
+import User from "./User";
 import ActivityMember from "./ActivityMember";
 
-export default class User extends Model<
-  InferAttributes<User, {}>,
-  InferCreationAttributes<User, {}>
+export default class Activity extends Model<
+  InferAttributes<Activity, {}>,
+  InferCreationAttributes<Activity, {}>
 > {
   // id can be undefined during creation when using `autoIncrement`
   declare id: CreationOptional<string>;
-  declare firstName: string;
-  declare lastName: string;
-  declare email: string;
+  declare prompt: string;
 
-  declare picture: string | null;
+  declare createdBy: number;
 
   // createdAt can be undefined during creation
   declare createdAt: CreationOptional<Date>;
@@ -29,29 +27,23 @@ export default class User extends Model<
   declare deletedAt: CreationOptional<Date>;
 }
 
-User.init(
+Activity.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    firstName: {
+    prompt: {
       type: new DataTypes.STRING(256),
       allowNull: false,
     },
-    lastName: {
-      type: new DataTypes.STRING(256),
+
+    createdBy: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
-    email: {
-      type: new DataTypes.STRING(256),
-      allowNull: false,
-    },
-    picture: {
-      type: new DataTypes.TEXT(),
-      allowNull: true,
-    },
+
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
     deletedAt: {
@@ -60,12 +52,13 @@ User.init(
     },
   },
   {
-    tableName: "User",
+    tableName: "Activity",
     sequelize,
     paranoid: true,
   }
 );
 
 setImmediate(() => {
-  User.belongsToMany(Activity, { through: ActivityMember });
+  Activity.belongsTo(User, { foreignKey: "createdBy" });
+  Activity.belongsToMany(User, { through: ActivityMember });
 });
